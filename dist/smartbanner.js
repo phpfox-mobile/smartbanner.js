@@ -100,7 +100,17 @@ function () {
       var selector = Detector.jQueryMobilePage() ? '.ui-page' : 'html';
       return document.querySelectorAll(selector);
     }
-  }]);
+  }, {
+    key: "isSafariBrowser",
+    value: function isSafariBrowser() {
+      const UA = window.navigator.userAgent
+      if (/iPhone|iPad|iPod/i.test(UA) && /Safari/i.test(UA)) {
+        return true;
+      }
+      return false;
+    }
+  }
+  ]);
 
   return Detector;
 }();
@@ -117,6 +127,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 
 var smartbanner;
 window.addEventListener('load', function () {
+  if (!_smartbanner["default"]) {
+    return null
+  }
   smartbanner = new _smartbanner["default"]();
 
   if (smartbanner.apiEnabled) {
@@ -165,23 +178,11 @@ function () {
   _createClass(OptionParser, [{
     key: "parse",
     value: function parse() {
-      var metas = document.getElementsByTagName('meta');
+      const smartBannerConfig = $.smartbannerConfig
       var options = {};
-      Array.apply(null, metas).forEach(function (meta) {
-        var optionName = null;
-        var name = meta.getAttribute('name');
-        var content = meta.getAttribute('content');
-
-        if (name && content && valid(name) && content.length > 0) {
-          optionName = name.split(':')[1];
-
-          if (optionName.indexOf('-') !== -1) {
-            optionName = convertToCamelCase(optionName);
-          }
-
-          options[optionName] = content;
-        }
-      });
+      Object.keys(smartBannerConfig).forEach(function(key) {
+        options[key] = smartBannerConfig[key]
+      })
       return options;
     }
   }]);
@@ -299,14 +300,18 @@ function restoreContentPosition() {
 var SmartBanner =
 /*#__PURE__*/
 function () {
+  const isSafari = _detector["default"].isSafariBrowser();
+  if(isSafari) {
+    return null;
+  }
   function SmartBanner() {
     _classCallCheck(this, SmartBanner);
-
     var parser = new _optionparser["default"]();
     this.options = parser.parse();
     this.platform = _detector["default"].platform();
     var event = new Event('smartbanner.init');
     document.dispatchEvent(event);
+
   } // DEPRECATED. Will be removed.
 
 
@@ -341,8 +346,20 @@ function () {
       if (!this.positioningDisabled) {
         setContentPosition(this.height);
       }
-
       addEventListeners(this);
+
+      $('#smartbanner__button').click(function () {
+        const options = $.smartbannerConfig
+        const platform = _detector["default"].platform();
+        if (platform === 'android') {
+          const url = `intent://${window.location.hostname}${window.location.pathname}/#Intent;scheme=https;package=${options.idPlayStore};end`;
+          window.location.replace(url);
+        } else if (platform === 'ios') {
+          const url = `https://apps.apple.com/us/app/id${options.idAppStore}`;
+          window.location.replace(url);
+
+        } else {}
+      });
     }
   }, {
     key: "exit",
@@ -421,7 +438,20 @@ function () {
     key: "html",
     get: function get() {
       var modifier = !this.options.customDesignModifier ? this.platform : this.options.customDesignModifier;
-      return "<div class=\"smartbanner smartbanner--".concat(modifier, " js_smartbanner\">\n      <a href=\"javascript:void();\" class=\"smartbanner__exit js_smartbanner__exit\" aria-label=\"").concat(this.closeLabel, "\"></a>\n      <div class=\"smartbanner__icon\" style=\"background-image: url(").concat(this.icon, ");\"></div>\n      <div class=\"smartbanner__info\">\n        <div>\n          <div class=\"smartbanner__info__title\">").concat(this.options.title, "</div>\n          <div class=\"smartbanner__info__author\">").concat(this.options.author, "</div>\n          <div class=\"smartbanner__info__price\">").concat(this.options.price).concat(this.priceSuffix, "</div>\n        </div>\n      </div>\n      <a href=\"").concat(this.buttonUrl, "\" target=\"_blank\" class=\"smartbanner__button js_smartbanner__button\" rel=\"noopener\" aria-label=\"").concat(this.options.button, "\"><span class=\"smartbanner__button__label\">").concat(this.options.button, "</span></a>\n    </div>");
+      return `<div class="smartbanner smartbanner--${modifier} js_smartbanner">
+      <a href="javascript:void();" class="smartbanner__exit js_smartbanner__exit" aria-label="${this.closeLabel}"></a>
+      <div class="smartbanner__icon" style="background-image: url(${this.options.icon});"></div>
+      <div class="smartbanner__info">
+        <div>
+          <div class="smartbanner__info__title">${this.options.title}</div>
+          <div class="smartbanner__info__author">${this.options.author}</div>
+          <div class="smartbanner__info__price">${this.options.price}</div>
+        </div>
+      </div>
+      <button id="smartbanner__button" class="smartbanner__button js_smartbanner__button" rel="noopener" aria-label="${this.options.button}">
+      <span class="smartbanner__button__label">VIEW</span>
+      </button>
+    </div>`;
     }
   }, {
     key: "height",
