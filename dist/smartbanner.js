@@ -104,7 +104,7 @@ function () {
     key: "isSafariBrowser",
     value: function isSafariBrowser() {
       const UA = window.navigator.userAgent
-      if (/iPhone|iPad|iPod/i.test(UA) && /Safari/i.test(UA)) {
+      if (/iPhone|iPad|iPod/i.test(UA) && /Safari/i.test(UA) && !/CriOS|FxiOS/i.test(UA)) {
         return true;
       }
       return false;
@@ -259,6 +259,7 @@ function removeEventListeners() {
 
 function setContentPosition(value) {
   var wrappers = _detector["default"].wrapperElement();
+  var headerPhpfoxFixed = getComputedStyle(document.querySelector('.sticky-bar')).position === 'fixed';
 
   for (var i = 0, l = wrappers.length, wrapper; i < l; i++) {
     wrapper = wrappers[i];
@@ -271,6 +272,11 @@ function setContentPosition(value) {
       var top = parseFloat(getComputedStyle(wrapper).top);
       wrapper.setAttribute(datas.originalTop, isNaN(top) ? 0 : top);
       wrapper.style.top = value + 'px';
+      document.body.classList.add('has-smartbanner');
+
+      if (headerPhpfoxFixed){
+        document.querySelector('#section-header .sticky-bar').style.marginTop = value + 'px';
+      }
     } else {
       if (wrapper.getAttribute(datas.originalMarginTop)) {
         continue;
@@ -279,20 +285,33 @@ function setContentPosition(value) {
       var margin = parseFloat(getComputedStyle(wrapper).marginTop);
       wrapper.setAttribute(datas.originalMarginTop, isNaN(margin) ? 0 : margin);
       wrapper.style.marginTop = value + 'px';
+      document.body.classList.add('has-smartbanner');
+      if (headerPhpfoxFixed){
+        document.querySelector('#section-header .sticky-bar').style.marginTop = value + 'px';
+      }
     }
   }
 }
 
 function restoreContentPosition() {
   var wrappers = _detector["default"].wrapperElement();
+  var headerPhpfoxFixed = getComputedStyle(document.querySelector('.sticky-bar')).position === 'fixed';
 
   for (var i = 0, l = wrappers.length, wrapper; i < l; i++) {
     wrapper = wrappers[i];
 
     if (_detector["default"].jQueryMobilePage() && wrapper.getAttribute(datas.originalTop)) {
       wrapper.style.top = wrapper.getAttribute(datas.originalTop) + 'px';
+      document.body.classList.remove('has-smartbanner');
+      if (headerPhpfoxFixed){
+        document.querySelector('#section-header .sticky-bar').style.marginTop = '';
+      }
     } else if (wrapper.getAttribute(datas.originalMarginTop)) {
       wrapper.style.marginTop = wrapper.getAttribute(datas.originalMarginTop) + 'px';
+      document.body.classList.remove('has-smartbanner');
+      if (headerPhpfoxFixed){
+        document.querySelector('#section-header .sticky-bar').style.marginTop = '';
+      }
     }
   }
 }
@@ -437,8 +456,7 @@ function () {
   }, {
     key: "html",
     get: function get() {
-      var modifier = !this.options.customDesignModifier ? this.platform : this.options.customDesignModifier;
-      return `<div class="smartbanner smartbanner--${modifier} js_smartbanner">
+      return `<div class="smartbanner js_smartbanner">
       <a href="javascript:void();" class="smartbanner__exit js_smartbanner__exit" aria-label="${this.closeLabel}"></a>
       <div class="smartbanner__icon" style="background-image: url(${this.options.icon});"></div>
       <div class="smartbanner__info">
@@ -448,9 +466,9 @@ function () {
           <div class="smartbanner__info__price">${this.options.price}</div>
         </div>
       </div>
-      <button id="smartbanner__button" class="smartbanner__button js_smartbanner__button" rel="noopener" aria-label="${this.options.button}">
-      <span class="smartbanner__button__label">VIEW</span>
-      </button>
+      <a id="smartbanner__button" class="smartbanner__button js_smartbanner__button" rel="noopener" aria-label="${this.options.button}">
+      <span class="smartbanner__button__label">View</span>
+      </a>
     </div>`;
     }
   }, {

@@ -10,7 +10,7 @@
   z-index: 111;
   overflow-x: hidden;
   height: 84px;
-  background: #f3f3f3;
+  background: #1a1a1c;
   font-family: Helvetica, sans, sans-serif;
   /** Android styles **/ }
   .smartbanner__exit {
@@ -50,10 +50,12 @@
     width: 60%;
     height: 64px;
     align-items: center;
-    color: #000; }
+    }
     .smartbanner__info__title {
+      color: #ffffff;
       font-size: 14px; }
     .smartbanner__info__author, .smartbanner__info__price {
+      color: #94928e;
       font-size: 12px; }
   .smartbanner__button {
     position: absolute;
@@ -64,12 +66,11 @@
     padding: 0 10px;
     min-width: 10%;
     border-radius: 5px;
-    background: #f3f3f3;
-    color: #1474fc;
     font-size: 18px;
     text-align: center;
     text-decoration: none; }
     .smartbanner__button__label {
+      color: #3f8bee;
       text-align: center; }
   .smartbanner.smartbanner--android {
     background: #3d3d3d url("data:image/gif;base64,R0lGODlhCAAIAIABAFVVVf///yH5BAEHAAEALAAAAAAIAAgAAAINRG4XudroGJBRsYcxKAA7");
