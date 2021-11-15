@@ -259,7 +259,12 @@ function removeEventListeners() {
 
 function setContentPosition(value) {
   var wrappers = _detector["default"].wrapperElement();
-  var headerPhpfoxFixed = getComputedStyle(document.querySelector('.sticky-bar')).position === 'fixed';
+  var elePhpfoxFixed = document.querySelector('.sticky-bar');
+  var headerPhpfoxFixed = elePhpfoxFixed && getComputedStyle(elePhpfoxFixed).position === 'fixed';
+  if (!headerPhpfoxFixed) {
+    headerPhpfoxFixed = elePhpfoxFixed && getComputedStyle(elePhpfoxFixed.parentElement).position === 'fixed';
+    elePhpfoxFixed = elePhpfoxFixed.parentElement;
+  }
 
   for (var i = 0, l = wrappers.length, wrapper; i < l; i++) {
     wrapper = wrappers[i];
@@ -274,8 +279,8 @@ function setContentPosition(value) {
       wrapper.style.top = value + 'px';
       document.body.classList.add('has-smartbanner');
 
-      if (headerPhpfoxFixed){
-        document.querySelector('#section-header .sticky-bar').style.marginTop = value + 'px';
+      if (headerPhpfoxFixed) {
+        elePhpfoxFixed.style.marginTop = value + 'px';
       }
     } else {
       if (wrapper.getAttribute(datas.originalMarginTop)) {
@@ -286,8 +291,8 @@ function setContentPosition(value) {
       wrapper.setAttribute(datas.originalMarginTop, isNaN(margin) ? 0 : margin);
       wrapper.style.marginTop = value + 'px';
       document.body.classList.add('has-smartbanner');
-      if (headerPhpfoxFixed){
-        document.querySelector('#section-header .sticky-bar').style.marginTop = value + 'px';
+      if (headerPhpfoxFixed) {
+        elePhpfoxFixed.style.marginTop = value + 'px';
       }
     }
   }
@@ -295,22 +300,26 @@ function setContentPosition(value) {
 
 function restoreContentPosition() {
   var wrappers = _detector["default"].wrapperElement();
-  var headerPhpfoxFixed = getComputedStyle(document.querySelector('.sticky-bar')).position === 'fixed';
-
+  var elePhpfoxFixed = document.querySelector('.sticky-bar');
+  var headerPhpfoxFixed = elePhpfoxFixed && getComputedStyle(elePhpfoxFixed).position === 'fixed';
+  if (!headerPhpfoxFixed) {
+    headerPhpfoxFixed = elePhpfoxFixed && getComputedStyle(elePhpfoxFixed.parentElement).position === 'fixed';
+    elePhpfoxFixed = elePhpfoxFixed.parentElement;
+  }
   for (var i = 0, l = wrappers.length, wrapper; i < l; i++) {
     wrapper = wrappers[i];
 
     if (_detector["default"].jQueryMobilePage() && wrapper.getAttribute(datas.originalTop)) {
       wrapper.style.top = wrapper.getAttribute(datas.originalTop) + 'px';
       document.body.classList.remove('has-smartbanner');
-      if (headerPhpfoxFixed){
-        document.querySelector('#section-header .sticky-bar').style.marginTop = '';
+      if (headerPhpfoxFixed) {
+        elePhpfoxFixed.style.marginTop = '';
       }
     } else if (wrapper.getAttribute(datas.originalMarginTop)) {
       wrapper.style.marginTop = wrapper.getAttribute(datas.originalMarginTop) + 'px';
       document.body.classList.remove('has-smartbanner');
-      if (headerPhpfoxFixed){
-        document.querySelector('#section-header .sticky-bar').style.marginTop = '';
+      if (headerPhpfoxFixed) {
+        elePhpfoxFixed.style.marginTop = '';
       }
     }
   }
